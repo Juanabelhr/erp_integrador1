@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:8.0
+    container_name: erp-mongodb
+    restart: always
+    environment:
+      MONGO_INITDB_DATABASE: ERP_Comercial_DB
+    volumes:
+      - mongo_data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - erp-network
+
+  backend:
+    build:
+      context: ./Erp.WebApi
+      dockerfile: Dockerfile
+    container_name: erp-backend
+    restart: always
+    depends_on:
+      - mongo
+    environment:
+      - ConnectionStrings__MongoDb=mongodb://mongo:27017
+      - MongoDbSettings__DatabaseName=ERP_Comercial_DB
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+    ports:
+      - "5236:8080"
+    networks:
+      - erp-network
+
+  frontend:
+    build:
+      context: ./erp-frontend
+      dockerfile: Dockerfile
+    container_name: erp-frontend
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+      - "5173:80"
+    networks:
+      - erp-network
+
+volumes:
+  mongo_data:
+    driver: local
+
+networks:
+  erp-network:
+    driver: bridge
