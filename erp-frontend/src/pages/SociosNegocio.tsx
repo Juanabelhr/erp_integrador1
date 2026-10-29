@@ -49,7 +49,8 @@ export default function SociosNegocio() {
           .filter(Boolean)
           .join(', ');
         setDireccion(dir);
-        setMensaje({ tipo: 'success', texto: `Consulta RUC/DNI Validada — Estado: ${res.data.estado_del_contribuyente} (${res.data.condicion_de_domicilio})` });
+        const fuente = res.data.origen === 'API_SUNAT_VIVO' ? ' (SUNAT en Vivo)' : '';
+        setMensaje({ tipo: 'success', texto: `Validación Exitosa${fuente} — ${res.data.estado_del_contribuyente} (${res.data.condicion_de_domicilio})` });
       }
     } catch (err) {
       setMensaje({ tipo: 'error', texto: 'No se pudo consultar el documento.' });
